@@ -1,6 +1,16 @@
 const express = require('express');
-
 const app = express();
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb+srv://gabrielamade:Myo3fhdo85s8yhYU@cluster0.ekwh9m4.mongodb.net/?retryWrites=true&w=majority',
+{ useNewUrlParser: true,
+  useUnifiedTopology: true })
+.then(() => console.log('Connexion à MongoDB réussie !'))
+.catch(() => console.log('Connexion à MongoDB échouée !'));
+  
+
+
+app.use(express.json) 
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -9,24 +19,68 @@ app.use((req, res, next) => {
     next();
   });
 
-app.use('/api/stuff', (req, res, next) => {
+app.post('/api/books', (req, res, next) => {
+   console.log(req.body); 
+   res.status(201).json({
+       message: 'Objet crée'
+   })
+})
+
+
+app.get('/api/books', (req, res, next) => {
     const stuff = [
-      {
-        _id: 'oeihfzeoi',
-        title: 'Mon premier objet',
-        description: 'Les infos de mon premier objet',
-        imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-        price: 4900,
-        userId: 'qsomihvqios',
-      },
-      {
-        _id: 'oeihfzeomoihi',
-        title: 'Mon deuxième objet',
-        description: 'Les infos de mon deuxième objet',
-        imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-        price: 2900,
-        userId: 'qsomihvqios',
-      },
+        {
+            "id": "1",
+            "userId" : "clc4wj5lh3gyi0ak4eq4n8syr",
+            "title" : "Milwaukee Mission",
+            "author": "Elder Cooper",
+            "imageUrl" : "https://via.placeholder.com/206x260",
+            "year" : 2021,
+            "genre" : "Policier",
+            "ratings" : [{
+              "userId" : "1",
+              "grade": 5
+            },
+              {
+                "userId" : "1",
+                "grade": 5
+              },
+              {
+                "userId" : "clc4wj5lh3gyi0ak4eq4n8syr",
+                "grade": 5
+              },
+              {
+                "userId" : "1",
+                "grade": 5
+              }],
+            "averageRating": 3
+          },
+            {
+              "id": "2",
+              "userId" : "clbxs3tag6jkr0biul4trzbrv",
+              "title" : "Book for Esther",
+              "author": "Alabaster",
+              "imageUrl" : "https://via.placeholder.com/206x260",
+              "year" : 2022,
+              "genre" : "Paysage",
+              "ratings" : [{
+                "userId" : "clbxs3tag6jkr0biul4trzbrv",
+                "grade": 4
+              },
+                {
+                  "userId" : "1",
+                  "grade": 5
+                },
+                {
+                  "userId" : "1",
+                  "grade": 5
+                },
+                {
+                  "userId" : "1",
+                  "grade": 5
+                }],
+              "averageRating": 4.2
+            },
     ];
     res.status(200).json(stuff);
   });
