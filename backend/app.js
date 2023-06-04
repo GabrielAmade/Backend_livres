@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 
+const Book = require('./models/Book')
+
 mongoose.connect('mongodb+srv://gabrielamade:Myo3fhdo85s8yhYU@cluster0.ekwh9m4.mongodb.net/?retryWrites=true&w=majority',
 { useNewUrlParser: true,
   useUnifiedTopology: true })
@@ -19,70 +21,39 @@ app.use((req, res, next) => {
     next();
   });
 
-app.post('/api/books', (req, res, next) => {
-   console.log(req.body); 
-   res.status(201).json({
-       message: 'Objet crée'
-   })
-})
+app.post('/api/Ajouter', (req, res, next) => {
+   delete req.body.id
+   const book = new Book({
+       ...req.body
+   });
+   book.save()
+    .then(() => res.status(201).json({message: "Objet enregistré"}))
+    .catch(error => res.status(400).json({error}));
+});
+
+app.put('/api/livre/modifier/:id', (req, res, next) => {
+    Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+      .then(() => res.status(200).json({ message: 'Livre modifié !'}))
+      .catch(error => res.status(400).json({ error }));
+  });
+
+app.delete('/api/livre/:id', (req, res, next) => {
+Book.deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Livre supprimé !'}))
+    .catch(error => res.status(400).json({ error }));
+});
+
+app.get('/api/livre/:id', (req, res, next) => {
+    Book.findOne({ _id: req.params.id })
+      .then(book => res.status(200).json(book))
+      .catch(error => res.status(404).json({ error }));
+  });
 
 
 app.get('/api/books', (req, res, next) => {
-    const stuff = [
-        {
-            "id": "1",
-            "userId" : "clc4wj5lh3gyi0ak4eq4n8syr",
-            "title" : "Milwaukee Mission",
-            "author": "Elder Cooper",
-            "imageUrl" : "https://via.placeholder.com/206x260",
-            "year" : 2021,
-            "genre" : "Policier",
-            "ratings" : [{
-              "userId" : "1",
-              "grade": 5
-            },
-              {
-                "userId" : "1",
-                "grade": 5
-              },
-              {
-                "userId" : "clc4wj5lh3gyi0ak4eq4n8syr",
-                "grade": 5
-              },
-              {
-                "userId" : "1",
-                "grade": 5
-              }],
-            "averageRating": 3
-          },
-            {
-              "id": "2",
-              "userId" : "clbxs3tag6jkr0biul4trzbrv",
-              "title" : "Book for Esther",
-              "author": "Alabaster",
-              "imageUrl" : "https://via.placeholder.com/206x260",
-              "year" : 2022,
-              "genre" : "Paysage",
-              "ratings" : [{
-                "userId" : "clbxs3tag6jkr0biul4trzbrv",
-                "grade": 4
-              },
-                {
-                  "userId" : "1",
-                  "grade": 5
-                },
-                {
-                  "userId" : "1",
-                  "grade": 5
-                },
-                {
-                  "userId" : "1",
-                  "grade": 5
-                }],
-              "averageRating": 4.2
-            },
-    ];
-    res.status(200).json(stuff);
+    Book.find()
+      .then(nooks => res.status(200).json(books))
+      .catch(error => res.status(400).json({error}));
   });
 
 module.exports = app;
