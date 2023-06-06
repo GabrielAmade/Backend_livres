@@ -2,15 +2,14 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 
-const Book = require('./models/Book')
+const bookRoutes = require('./routes/book')
+const userRoutes = require('./routes/user')
 
 mongoose.connect('mongodb+srv://gabrielamade:Myo3fhdo85s8yhYU@cluster0.ekwh9m4.mongodb.net/?retryWrites=true&w=majority',
 { useNewUrlParser: true,
   useUnifiedTopology: true })
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch(() => console.log('Connexion à MongoDB échouée !'));
-  
-
 
 app.use(express.json) 
 
@@ -21,39 +20,7 @@ app.use((req, res, next) => {
     next();
   });
 
-app.post('/api/Ajouter', (req, res, next) => {
-   delete req.body.id
-   const book = new Book({
-       ...req.body
-   });
-   book.save()
-    .then(() => res.status(201).json({message: "Objet enregistré"}))
-    .catch(error => res.status(400).json({error}));
-});
-
-app.put('/api/livre/modifier/:id', (req, res, next) => {
-    Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Livre modifié !'}))
-      .catch(error => res.status(400).json({ error }));
-  });
-
-app.delete('/api/livre/:id', (req, res, next) => {
-Book.deleteOne({ _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Livre supprimé !'}))
-    .catch(error => res.status(400).json({ error }));
-});
-
-app.get('/api/livre/:id', (req, res, next) => {
-    Book.findOne({ _id: req.params.id })
-      .then(book => res.status(200).json(book))
-      .catch(error => res.status(404).json({ error }));
-  });
-
-
-app.get('/api/books', (req, res, next) => {
-    Book.find()
-      .then(nooks => res.status(200).json(books))
-      .catch(error => res.status(400).json({error}));
-  });
+app.use('./api/book', bookRoutes)
+app.use('./api/auth', userRoutes)
 
 module.exports = app;
